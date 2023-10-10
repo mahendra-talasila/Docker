@@ -6,7 +6,7 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image
-                    sh 'sudo docker build -t mahendra283/nice-job nice-job/'
+                    sh 'sudo docker build -t mahendra283/nice-job'
                 }
             }
         }
