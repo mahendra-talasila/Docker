@@ -1,22 +1,32 @@
 pipeline {
-    agent {label 'docker'}
-
+    agent any
+    
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
-        IMAGE_NAME = "nice-job"
-        VERSION = "1.0"
-        FULL_IMAGE_NAME = "$DOCKERHUB_CREDENTIALS_USR/$IMAGE_NAME:$VERSION"
+        DOCKER_IMAGE = 'mahendra283/nice-job:tagname'  // Specify your Docker image
+        EC2_INSTANCE = '54.159.183.188'  // EC2 instance IP or DNS
+        SSH_CREDENTIALS = credentials('ec2key')  // SSH credentials for EC2
     }
 
     stages {
-        stage('Pull') {
+        stage('Deploy Docker Image') {
             steps {
-                sh 'docker pull $FULL_IMAGE_NAME'          
+                script {
+                    // SSH into the EC2 instance
+                    sshCommand remote: EC2_INSTANCE, 
+                        credentialsId: SSH_CREDENTIALS,
+                        command: "docker pull ${DOCKER_IMAGE}"
+                }
             }
         }
-        stage('Run') {
+
+        stage('Run Docker Container') {
             steps {
-                sh 'docker run -d --name $IMAGE_NAME$VERSION3000 -p 3000:3000 $FULL_IMAGE_NAME'
+                script {
+                    // SSH into the EC2 instance and run the Docker container
+                    sshCommand remote: EC2_INSTANCE, 
+                        credentialsId: SSH_CREDENTIALS,
+                        command: "docker run -d -p 30000:5000 ${DOCKER_IMAGE}"
+                }
             }
         }
     }
