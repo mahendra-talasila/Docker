@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'mahendra283/nice-job:tagname'  // Specify your Docker image
         EC2_INSTANCE = '54.159.183.188'  // EC2 instance IP or DNS
-        SSH_CREDENTIALS = credentials('ec2key')  // SSH credentials for EC2
+        SSH_CREDENTIALS = credentials('ec2pem')  // SSH credentials for EC2
     }
 
     stages {
