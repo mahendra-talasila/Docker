@@ -2,34 +2,17 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout Code') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Deploy Docker Image') {
+             stage('Deploy') {
             steps {
                 script {
-                    def remote = [:]
-                    remote.name = 'EC2'
-                    remote.host = '54.90.194.136'
-                    remote.user = 'ec2-user'
-                    remote.identityFile = credentials('ec2pem')
-
-                    sshCommand(remote: remote, command: '''
-                        # Pull the latest Docker image
-                        docker pull mahendra283/hello-world
-
-                        # Stop and remove the existing container (if it exists)
-                        docker stop mahendra283/hello-world || true
-                        docker rm mahendra283/hello-world || true
-
-                        # Run the new container
-                        docker run -d --name mahendra/hw -p 3000:3000 mahendra283/hello-world
-                    ''')
+              sshagent(credentials: ['ec2pem']) {
+                        sh '''
+                            ssh -o StrictHostKeyChecking=no -i "/tmp/jenkins.pem" ec2-user@54.90.194.136 "docker pull mahendra283/hello-world"
+                            ssh -o StrictHostKeyChecking=no -i "/tmp/jenkins.pem" ec2-user@54.90.194.136 "docker run -d --name mahendra -p 3000:3000 mahendra283/hello-world"
+                        '''
+                   }
                 }
             }
         }
-    }
+    }   
 }
