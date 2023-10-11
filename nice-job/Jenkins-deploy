@@ -21,8 +21,6 @@ pipeline {
                 }
             }
         }
-    }
-
 
         stage('Run Docker Container') {
             steps {
@@ -30,11 +28,11 @@ pipeline {
                     // Use 'withCredentials' block to securely handle SSH key
                     withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS, keyFileVariable: 'KEYFILE')]) {
                         sshagent(['SSH_CREDENTIALS']) {
-                        sh "ssh -i $KEYFILE -o StrictHostKeyChecking=no ec2-user@${EC2_INSTANCE} 'docker run -d -p 80:80 ${DOCKER_IMAGE}'"
-                                }
-                            }
+                            sh "ssh -i $KEYFILE -o StrictHostKeyChecking=no ec2-user@${EC2_INSTANCE} 'docker run -d -p 80:80 ${DOCKER_IMAGE}'"
                         }
                     }
                 }
-
+            }
+        }
+    }
 }
