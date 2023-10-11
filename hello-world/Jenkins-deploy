@@ -17,7 +17,7 @@ pipeline {
                     docker pull \${DOCKER_IMAGE}
                     docker run -d --name container1 -p 3000:3000 \${DOCKER_IMAGE}
                     >> EOF
-                 """
+                    """
                 }
             }
         }

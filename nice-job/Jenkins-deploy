@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'mahendra283/nice-job'  // Specify your Docker image
         EC2_INSTANCE = '54.159.183.188'  // EC2 instance IP or DNS
-        SSH_CREDENTIALS = credentials('ec2pem')  // SSH credentials for EC2
+        SSH_KEY = credentials('ec2pem')  // SSH credentials for EC2
     }
 
     stages {
@@ -13,13 +13,14 @@ pipeline {
                 script {
                     // SSH into the EC2 instance
                     sh """
-                    ssh -i ${SSH_CREDENTIALS} -o StrictHostKeyChecking=no ec2-user@${EC2_INSTANCE} << EOF
+                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ec2-user@${EC2_INSTANCE} << EOF
                     docker pull \${DOCKER_IMAGE}
-                    docker run -d --name container1 -p 3000:3000 \${DOCKER_IMAGE}
+                    docker run -d --name container1 -p 6000:3000 \${DOCKER_IMAGE}
                     >> EOF
-                 """
+                    """
                 }
             }
         }
     }
 }
+
