@@ -6,6 +6,7 @@ WORKDIR /app/docker-mahendra
 
 # Copy package.json and package-lock.json to the container
 COPY package*.json ./
+COPY helloworld.js .
 
 # Install application dependencies
 RUN npm install
