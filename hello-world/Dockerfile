@@ -5,17 +5,15 @@ FROM node:20-alpine
 WORKDIR /app/docker-mahendra
 
 # Copy package.json and package-lock.json to the container
-COPY package*.json ./
+COPY package.json .
 COPY helloworld.js .
 
 # Install application dependencies
 RUN npm install
 
-# Copy the rest of the application code to the container
-COPY . .
 
 # Expose a port (if your application listens on a specific port)
 EXPOSE 3000
 
 # Define the command to run your application
-CMD ["echo", "Hello World"]
+ENTRYPOINT ["node", "helloworld.js"]
