@@ -15,7 +15,7 @@ pipeline {
                     sh """
                     ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ec2-user@${EC2_INSTANCE} << EOF
                     docker pull \${DOCKER_IMAGE}
-                    docker run -d --name container1 -p 3000:3000 \${DOCKER_IMAGE}
+                    docker run -d --name container1 -p 6000:3000 \${DOCKER_IMAGE}
                     >> EOF
                  """
                 }
