@@ -4,23 +4,37 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'mahendra283/nice-job'  // Specify your Docker image
         EC2_INSTANCE = '54.159.183.188'  // EC2 instance IP or DNS
-        SSH_KEY = credentials('ec2pem')  // SSH credentials for EC2
+        SSH_CREDENTIALS = credentials('ec2pem')  // SSH credentials for EC2
     }
 
     stages {
         stage('Deploy Docker Image') {
             steps {
                 script {
-                    // SSH into the EC2 instance
-                    sh """
-                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ec2-user@${EC2_INSTANCE} << EOF
-                    docker pull \${DOCKER_IMAGE}
-                    docker run -d --name container1 -p 6000:3000 \${DOCKER_IMAGE}
-                    >> EOF
-                    """
+                    // Use 'withCredentials' block to securely handle SSH key
+                    withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS, keyFileVariable: 'KEYFILE')]) {
+                        sh "scp -i $KEYFILE ${DOCKER_IMAGE} ec2-user@${EC2_INSTANCE}:~/"
+                        sshagent(['SSH_CREDENTIALS']) {
+                            sh "ssh -i $KEYFILE -o StrictHostKeyChecking=no ec2-user@${EC2_INSTANCE} 'docker pull ${DOCKER_IMAGE}'"
+                        }
+                    }
                 }
             }
         }
     }
-}
 
+
+        stage('Run Docker Container') {
+            steps {
+                script {
+                    // Use 'withCredentials' block to securely handle SSH key
+                    withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS, keyFileVariable: 'KEYFILE')]) {
+                        sshagent(['SSH_CREDENTIALS']) {
+                        sh "ssh -i $KEYFILE -o StrictHostKeyChecking=no ec2-user@${EC2_INSTANCE} 'docker run -d -p 80:80 ${DOCKER_IMAGE}'"
+                                }
+                            }
+                        }
+                    }
+                }
+
+}
